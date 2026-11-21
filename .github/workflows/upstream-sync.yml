@@ -116,11 +116,11 @@ jobs:
             echo
             echo "Resolve by merging \`upstream/main\` into a branch by hand. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           } > /tmp/issue.md
-          existing=$(gh issue list --state open --search "in:title Upstream sync: merge conflict" --json number --jq '.[0].number')
+          existing=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "in:title Upstream sync: merge conflict" --json number --jq '.[0].number')
           if [ -n "$existing" ]; then
-            gh issue comment "$existing" --body-file /tmp/issue.md
+            gh issue comment --repo "$GITHUB_REPOSITORY" "$existing" --body-file /tmp/issue.md
           else
-            gh issue create --title "$title" --body-file /tmp/issue.md
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file /tmp/issue.md
           fi
 
       - name: Install dependencies
@@ -180,11 +180,11 @@ jobs:
           } > /tmp/pr.md
 
           title="Upstream sync: ${{ steps.check.outputs.behind }} new commit(s), typecheck $tc, tests $ts"
-          existing=$(gh pr list --head "$SYNC_BRANCH" --base main --state open --json number --jq '.[0].number')
+          existing=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$SYNC_BRANCH" --base main --state open --json number --jq '.[0].number')
           if [ -n "$existing" ]; then
-            gh pr edit "$existing" --title "$title" --body-file /tmp/pr.md
+            gh pr edit --repo "$GITHUB_REPOSITORY" "$existing" --title "$title" --body-file /tmp/pr.md
           else
-            gh pr create --head "$SYNC_BRANCH" --base main --title "$title" --body-file /tmp/pr.md
+            gh pr create --repo "$GITHUB_REPOSITORY" --head "$SYNC_BRANCH" --base main --title "$title" --body-file /tmp/pr.md
           fi
 
       - name: Nothing to do
